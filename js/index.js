@@ -56,11 +56,9 @@ $(function() {
   /* title */
 
   $( "#title" ).on( "beforeshow", function( ) {
-    $( "#status" ).html( "" );
   } );
 
   $( "#title" ).on( "tick", function( ) {
-    $( "#status" ).html( $( "#status" ).html() + "." );
   } );
 
   /* world-select */
