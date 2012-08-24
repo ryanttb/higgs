@@ -10,29 +10,23 @@ $(function() {
     prevScreen = currentScreen;
 
     if ( prevScreen ) {
+      prevScreen.trigger( "beforehide" );
       prevScreen.hide( );
+      prevScreen.trigger( "hide" );
     }
 
     currentScreen = $( id );
     
-    // init
-    switch ( currentScreen.prop( "id" ) ) {
-      case "splash": initSplash( ); break;
-      case "world-select": initWorldSelect( ); break;
-    }
-
+    currentScreen.trigger( "beforeshow" );
     currentScreen.show( );
+    currentScreen.trigger( "show" );
 
     tick( );
   }
 
   function tick( ) {
     if ( currentScreen ) {
-      switch ( currentScreen.prop( "id" ) ) {
-        case "title": tickTitle( ); break;
-        case "world-select": tickWorldSelect( ); break;
-        default: break;
-      }
+      currentScreen.trigger( "tick" );
 
       timeoutTick = setTimeout( tick, 500 );
     }
@@ -53,31 +47,23 @@ $(function() {
 
   /* splash */
 
-  function initSplash( ) {
+  $( "#splash" ).on( "show", function ( ) {
     setTimeout( function() {
       changeScreen( "#title" );
     }, 1000 );
-  }
+  } );
 
   /* title */
 
-  function tickTitle( ) {
-  }
+  $( "#title" ).on( "beforeshow", function( ) {
+    $( "#status" ).html( "" );
+  } );
+
+  $( "#title" ).on( "tick", function( ) {
+    $( "#status" ).html( $( "#status" ).html() + "." );
+  } );
 
   /* world-select */
-
-  function initWorldSelect( ) {
-  }
-
-  function tickWorldSelect( ) {
-  }
-
-  /*
-  $( ".world-option a" ).click( function( e ) {
-    currentWorld = $( this ).data( "world" );
-    changeScreen( "#level-select" );
-  } );
-  */
 
   /* let's get going! */
 
