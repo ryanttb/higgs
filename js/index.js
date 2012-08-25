@@ -63,6 +63,12 @@ $(function() {
 
   /* world-select */
 
+  /* level-select */
+
+  $( ".level-option a" ).click( function( ) {
+    $( "#level-loading-tip" ).html( $( this ).data( "tip" ) || "" );
+  } );
+
   /* let's get going! */
 
   // pick a starting page
