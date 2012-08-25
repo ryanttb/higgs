@@ -69,6 +69,14 @@ $(function() {
     $( "#level-loading-tip" ).html( $( this ).data( "tip" ) || "" );
   } );
 
+  /* level-loading */
+
+  $( "#level-loading" ).on( "show", function ( ) {
+    setTimeout( function() {
+      changeScreen( "#game" );
+    }, 1000 );
+  } );
+
   /* let's get going! */
 
   // pick a starting page
