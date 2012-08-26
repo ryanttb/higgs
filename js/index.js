@@ -4,7 +4,8 @@ $(function() {
       prevScreen = null,
       timeoutTick = null,
 
-      startDown = false;
+      startDown = false,
+      bDown = false;
 
   /* game-specific state */
 
@@ -23,6 +24,7 @@ $(function() {
 
     // clear buttons
     startDown = false;
+    bDown = false;
 
     currentScreen = $( id );
     
@@ -47,6 +49,10 @@ $(function() {
     if ( e.keyCode === 13 && currentScreen && currentScreen.find( "a:focus" ).length === 0 ) {
       e.preventDefault( );
       startDown = e.type === "keydown";
+      return false;
+    } else if ( e.keyCode === 27 ) {
+      e.preventDefault( );
+      bDown = e.type === "keydown";
       return false;
     }
   } );
@@ -78,6 +84,9 @@ $(function() {
   } );
 
   $( "#title" ).on( "tick", function( ) {
+    if ( startDown || bDown ) {
+      changeScreen( "#pause" );
+    }
   } );
 
   /* world-select */
@@ -101,7 +110,7 @@ $(function() {
   /* game */
 
   $( "#game" ).on( "tick", function ( ) {
-    if ( startDown ) {
+    if ( startDown || bDown ) {
       changeScreen( "#pause" );
     }
   } );
