@@ -6,6 +6,7 @@ body {
 .screen {
   background: #fdfdfd;
   display: none;
+  cursor: default;
 
   position: absolute;
   left: 0;

@@ -28,6 +28,7 @@ $(function() {
     
     currentScreen.trigger( "beforeshow" );
     currentScreen.show( );
+    currentScreen.find( "a" ).first().focus( );
     currentScreen.trigger( "show" );
 
     tick( );
@@ -43,7 +44,7 @@ $(function() {
 
   // hook into button/key events to manage our button state
   $( "body" ).on( "keydown keyup", function( e ) {
-    if ( e.keyCode === 13 ) {
+    if ( e.keyCode === 13 && currentScreen && currentScreen.find( "a:focus" ).length === 0 ) {
       e.preventDefault( );
       startDown = e.type === "keydown";
       return false;
@@ -73,7 +74,7 @@ $(function() {
 
   /* title */
 
-  $( "#title" ).on( "beforeshow", function( ) {
+  $( "#title" ).on( "show", function( ) {
   } );
 
   $( "#title" ).on( "tick", function( ) {
@@ -107,10 +108,10 @@ $(function() {
 
   /* pause */
 
+  $( "#pause" ).on( "show", function ( ) {
+  } );
+
   $( "#pause" ).on( "tick", function ( ) {
-    if ( startDown ) {
-      changeScreen( "#game" );
-    }
   } );
 
   /* quit-level */
