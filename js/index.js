@@ -2,7 +2,13 @@ $(function() {
   /* game engine */
   var currentScreen = null,
       prevScreen = null,
-      timeoutTick = null;
+      timeoutTick = null,
+
+      startDown = false;
+
+  /* game-specific state */
+
+  var currentLevel = "";
 
   function changeScreen( id ) {
     clearTimeout( timeoutTick );
@@ -14,6 +20,9 @@ $(function() {
       prevScreen.hide( );
       prevScreen.trigger( "hide" );
     }
+
+    // clear buttons
+    startDown = false;
 
     currentScreen = $( id );
     
@@ -28,9 +37,18 @@ $(function() {
     if ( currentScreen ) {
       currentScreen.trigger( "tick" );
 
-      timeoutTick = setTimeout( tick, 500 );
+      timeoutTick = setTimeout( tick, 128 );
     }
   }
+
+  // hook into button/key events to manage our button state
+  $( "body" ).on( "keydown keyup", function( e ) {
+    if ( e.keyCode === 13 ) {
+      e.preventDefault( );
+      startDown = e.type === "keydown";
+      return false;
+    }
+  } );
 
   // hook up generic screen change links
   $( "a[href^='#']" ).click( function( e ) {
@@ -66,7 +84,9 @@ $(function() {
   /* level-select */
 
   $( ".level-option a" ).click( function( ) {
-    $( "#level-loading-tip" ).html( $( this ).data( "tip" ) || "" );
+    var levelOption = $( this );
+    currentLevel = levelOption.data( "level" ) || "";
+    $( "#level-loading-tip" ).html( levelOption.data( "tip" ) || "" );
   } );
 
   /* level-loading */
@@ -75,6 +95,28 @@ $(function() {
     setTimeout( function() {
       changeScreen( "#game" );
     }, 1000 );
+  } );
+
+  /* game */
+
+  $( "#game" ).on( "tick", function ( ) {
+    if ( startDown ) {
+      changeScreen( "#pause" );
+    }
+  } );
+
+  /* pause */
+
+  $( "#pause" ).on( "tick", function ( ) {
+    if ( startDown ) {
+      changeScreen( "#game" );
+    }
+  } );
+
+  /* quit-level */
+
+  $( "#quit-level-yes" ).click( function( ) {
+    changeScreen( "#world-" + currentLevel[ 0 ] + "-level-select" );
   } );
 
   /* let's get going! */
