@@ -7,6 +7,9 @@ body {
   background: #fdfdfd;
   display: none;
   cursor: default;
+  margin: 0;
+  padding; 0;
+  overflow: hidden;
 
   position: absolute;
   left: 0;

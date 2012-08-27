@@ -5,7 +5,9 @@ $(function() {
       timeoutTick = null,
 
       startDown = false,
-      bDown = false;
+      bDown = false,
+
+      gameContext = null;
 
   /* game-specific state */
 
@@ -108,6 +110,20 @@ $(function() {
   } );
 
   /* game */
+
+  $( "#game" ).on( "beforeshow", function ( ) {
+    var gameScreen = $( this );
+
+    if ( !gameContext ) {
+      gameScreen.append( '<canvas width="' + gameScreen.width( ) + '" height="' + gameScreen.height( ) + '"></canvas>' );
+      gameContext = gameScreen.find( "canvas" )[ 0 ].getContext( "2d" );
+    } else {
+      // recreate?
+    }
+
+    gameContext.fill = "#0000ff";
+    gameContext.fillRect( 0, 0, 100, 100 ); //gameScreen.width( ), gameScreen.height( ) );
+  } );
 
   $( "#game" ).on( "tick", function ( ) {
     if ( startDown || bDown ) {
