@@ -32,7 +32,11 @@ $(function() {
     
     currentScreen.trigger( "beforeshow" );
     currentScreen.show( );
-    currentScreen.find( "a" ).first().focus( );
+
+    if ( currentScreen.hasClass( "menu" ) ) {
+      currentScreen.find( "a" ).first().focus( );
+    }
+
     currentScreen.trigger( "show" );
 
     tick( );
@@ -48,7 +52,7 @@ $(function() {
 
   // hook into button/key events to manage our button state
   $( "body" ).on( "keydown keyup", function( e ) {
-    if ( e.keyCode === 13 && currentScreen && currentScreen.find( "a:focus" ).length === 0 ) {
+    if ( e.keyCode === 13 && currentScreen && currentScreen.hasClass( "menu" ) ) {
       e.preventDefault( );
       startDown = e.type === "keydown";
       return false;
@@ -86,9 +90,6 @@ $(function() {
   } );
 
   $( "#title" ).on( "tick", function( ) {
-    if ( startDown || bDown ) {
-      changeScreen( "#pause" );
-    }
   } );
 
   /* world-select */
