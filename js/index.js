@@ -52,7 +52,7 @@ $(function() {
 
   // hook into button/key events to manage our button state
   $( "body" ).on( "keydown keyup", function( e ) {
-    if ( e.keyCode === 13 && currentScreen && currentScreen.hasClass( "menu" ) ) {
+    if ( e.keyCode === 13 && currentScreen && !currentScreen.hasClass( "menu" ) ) {
       e.preventDefault( );
       startDown = e.type === "keydown";
       return false;
