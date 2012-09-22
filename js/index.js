@@ -87,6 +87,12 @@ $(function() {
   /* title */
 
   $( "#title" ).on( "show", function( ) {
+    // reset the level
+    currentLevel = "";
+  } );
+
+  $( ".title-arcade" ).click( function( ) {
+    $( "#level-loading-tip" ).html( $( this ).data( "tip" ) || "" );
   } );
 
   $( "#title" ).on( "tick", function( ) {
@@ -143,7 +149,12 @@ $(function() {
   /* quit-level */
 
   $( "#quit-level-yes" ).click( function( ) {
-    changeScreen( "#world-" + currentLevel[ 0 ] + "-level-select" );
+    if ( currentLevel === "" ) {
+      // in arcade mode, quit to main mainue
+      changeScreen( "#title" );
+    } else {
+      changeScreen( "#world-" + currentLevel[ 0 ] + "-level-select" );
+    }
   } );
 
   /* let's get going! */
