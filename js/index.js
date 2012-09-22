@@ -6,6 +6,7 @@ $(function() {
 
       startDown = false,
       bDown = false,
+      aDown = false,
 
       gameCanvas = null,
       gameContext = null,
@@ -37,6 +38,7 @@ $(function() {
     // clear buttons
     startDown = false;
     bDown = false;
+    aDown = false;
 
     currentScreen = $( id );
     
@@ -69,6 +71,10 @@ $(function() {
     } else if ( e.keyCode === 27 ) {
       e.preventDefault( );
       bDown = e.type === "keydown";
+      return false;
+    } else if ( e.keyCode === 32 ) {
+      e.preventDefault( );
+      aDown = e.type === "keydown";
       return false;
     }
   } );
@@ -135,6 +141,7 @@ $(function() {
 
       // load resources
       resources.higgs = $( '<img src="img/higgs.png" />' )[ 0 ];
+      resources.photon = $( '<img src="img/photon.png" />' )[ 0 ];
     } else {
       // recreate?
     }
@@ -162,7 +169,8 @@ $(function() {
       gameContext.fillStyle = "#d0cccc";
       gameContext.fillRect( 0, 0, gameCanvas.width, gameCanvas.height);
 
-      gameContext.drawImage( resources.higgs, gameState.higgsX - 32, gameState.higgsY - 32 );
+      var higgsResource = aDown ? resources.higgs : resources.photon;
+      gameContext.drawImage( higgsResource, gameState.higgsX - 32, gameState.higgsY - 32 );
     }
   } );
 
