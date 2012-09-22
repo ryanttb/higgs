@@ -7,7 +7,17 @@ $(function() {
       startDown = false,
       bDown = false,
 
-      gameContext = null;
+      gameCanvas = null,
+      gameContext = null,
+
+      resources = { },
+
+      defaultGameState = {
+        higgsX: 0, //< current x location, set to have screen width on game start
+        higgsY: 0 //< current y location, set to bottom of screen on game start
+      },
+
+      gameState = { };
 
   /* game-specific state */
 
@@ -46,7 +56,7 @@ $(function() {
     if ( currentScreen ) {
       currentScreen.trigger( "tick" );
 
-      timeoutTick = setTimeout( tick, 128 );
+      timeoutTick = setTimeout( tick, 64 );
     }
   }
 
@@ -111,6 +121,29 @@ $(function() {
   /* level-loading */
 
   $( "#level-loading" ).on( "show", function ( ) {
+    var gameScreen = $( "#game" );
+
+    if ( !gameContext ) {
+      // create game canvas & load resources the first time
+      gameScreen.append( '<canvas width="' + gameScreen.width( ) + '" height="' + gameScreen.height( ) + '"></canvas>' );
+      gameCanvas = gameScreen.find( "canvas" )[ 0 ];
+      gameContext = gameCanvas.getContext( "2d" );
+
+      // set default state
+      defaultGameState.higgsX = gameCanvas.width / 2;
+      defaultGameState.higgsY = gameCanvas.height - 64;
+
+      // load resources
+      resources.higgs = $( '<img src="img/higgs.png" />' )[ 0 ];
+    } else {
+      // recreate?
+    }
+
+    // init current game state
+
+    $.extend( gameState, defaultGameState );
+
+    // start the game
     setTimeout( function() {
       changeScreen( "#game" );
     }, 1000 );
@@ -118,23 +151,18 @@ $(function() {
 
   /* game */
 
-  $( "#game" ).on( "beforeshow", function ( ) {
-    var gameScreen = $( this );
-
-    if ( !gameContext ) {
-      gameScreen.append( '<canvas width="' + gameScreen.width( ) + '" height="' + gameScreen.height( ) + '"></canvas>' );
-      gameContext = gameScreen.find( "canvas" )[ 0 ].getContext( "2d" );
-    } else {
-      // recreate?
-    }
-
-    gameContext.fill = "#0000ff";
-    gameContext.fillRect( 0, 0, 100, 100 ); //gameScreen.width( ), gameScreen.height( ) );
+  $( "#game" ).mousemove( function( e ) {
+    gameState.higgsX = e.offsetX;
   } );
 
   $( "#game" ).on( "tick", function ( ) {
     if ( startDown || bDown ) {
       changeScreen( "#pause" );
+    } else {
+      gameContext.fillStyle = "#d0cccc";
+      gameContext.fillRect( 0, 0, gameCanvas.width, gameCanvas.height);
+
+      gameContext.drawImage( resources.higgs, gameState.higgsX - 32, gameState.higgsY - 32 );
     }
   } );
 
