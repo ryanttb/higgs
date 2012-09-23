@@ -1,4 +1,16 @@
 $(function() {
+  /* box2d defines */
+  var b2Vec2 = Box2D.Common.Math.b2Vec2,
+      b2BodyDef = Box2D.Dynamics.b2BodyDef,
+      b2Body = Box2D.Dynamics.b2Body,
+      b2FixtureDef = Box2D.Dynamics.b2FixtureDef,
+      b2Fixture = Box2D.Dynamics.b2Fixture,
+      b2World = Box2D.Dynamics.b2World,
+      b2MassData = Box2D.Collision.Shapes.b2MassData,
+      b2PolygonShape = Box2D.Collision.Shapes.b2PolygonShape,
+      b2CircleShape = Box2D.Collision.Shapes.b2CircleShape,
+      b2DebugDraw = Box2D.Dynamics.b2DebugDraw;
+
   /* game engine */
   var currentScreen = null,
       prevScreen = null,
@@ -7,6 +19,8 @@ $(function() {
       startDown = false,
       bDown = false,
       aDown = false,
+
+      world = null, //< box2d world
 
       gameCanvas = null,
       gameContext = null,
@@ -22,11 +36,9 @@ $(function() {
         couplerY: 0 //< current position of a coupler segment (they move fast)
       },
 
-      gameState = { };
+      gameState = { }, //< state of active game play
 
-  /* game-specific state */
-
-  var currentLevel = "";
+      currentLevel = ""; //< level currently being played
 
   function changeScreen( id ) {
     clearTimeout( timeoutTick );
@@ -151,6 +163,12 @@ $(function() {
       // load resources
       resources.higgs = $( '<img src="img/higgs.png" />' )[ 0 ];
       resources.photon = $( '<img src="img/photon.png" />' )[ 0 ];
+
+      // create box2d world
+      world = new b2World(
+                new b2Vec2( 0, 10 ), //< gravity
+                true //< allow sleep
+              );
 
       // set default state
       defaultGameState.higgsX = gameCanvas.width / 2;
