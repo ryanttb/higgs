@@ -137,7 +137,7 @@ $(function() {
 
       // set default state
       defaultGameState.higgsX = gameCanvas.width / 2;
-      defaultGameState.higgsY = gameCanvas.height - 64;
+      defaultGameState.higgsY = gameCanvas.height - 128;
 
       // load resources
       resources.higgs = $( '<img src="img/higgs.png" />' )[ 0 ];
@@ -166,7 +166,7 @@ $(function() {
     if ( startDown || bDown ) {
       changeScreen( "#pause" );
     } else {
-      gameContext.fillStyle = "#d0cccc";
+      gameContext.fillStyle = "#b09999";
       gameContext.fillRect( 0, 0, gameCanvas.width, gameCanvas.height);
 
       var higgsResource = aDown ? resources.higgs : resources.photon;
