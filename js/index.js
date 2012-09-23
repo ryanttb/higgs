@@ -12,6 +12,8 @@ $(function() {
       gameContext = null,
 
       resources = { },
+      bgGradLeft = null, //< canvas gradient object for left half
+      bgGradRight = null, //< canvas gradient object for right half
 
       defaultGameState = {
         higgsX: 0, //< current x location, set to have screen width on game start
@@ -137,13 +139,22 @@ $(function() {
       gameCanvas = gameScreen.find( "canvas" )[ 0 ];
       gameContext = gameCanvas.getContext( "2d" );
 
-      // set default state
-      defaultGameState.higgsX = gameCanvas.width / 2;
-      defaultGameState.higgsY = gameCanvas.height - 128;
+      // create gradients
+      bgGradLeft = gameContext.createLinearGradient( 0, 0, gameCanvas.width / 2, 0 );
+      bgGradLeft.addColorStop( 0, "#222222" );
+      bgGradLeft.addColorStop( 1, "#676767" );
+
+      bgGradRight = gameContext.createLinearGradient( gameCanvas.width / 2, 0, gameCanvas.width, 0 );
+      bgGradRight.addColorStop( 0, "#676767" );
+      bgGradRight.addColorStop( 1, "#222222" );
 
       // load resources
       resources.higgs = $( '<img src="img/higgs.png" />' )[ 0 ];
       resources.photon = $( '<img src="img/photon.png" />' )[ 0 ];
+
+      // set default state
+      defaultGameState.higgsX = gameCanvas.width / 2;
+      defaultGameState.higgsY = gameCanvas.height - 128;
     } else {
       // recreate?
     }
@@ -173,23 +184,25 @@ $(function() {
       // process input, tick state
       //
 
-      gameState.couplerY += 96;
-      if ( gameState.couplerY > gameCanvas.height * 3 ) {
-        gameState.couplerY = 0;
-      }
+      gameState.couplerY = ( gameState.couplerY + 96 ) % ( gameCanvas.height * 3 );
 
       //
       // render
       //
 
-      // clear
-      gameContext.fillStyle = "#b09999";
-      gameContext.fillRect( 0, 0, gameCanvas.width, gameCanvas.height );
+      // draw tube
+      gameContext.save( );
+      gameContext.fillStyle = bgGradLeft;
+      gameContext.fillRect( 0, 0, gameCanvas.width / 2, gameCanvas.height );
+      gameContext.fillStyle = bgGradRight;
+      gameContext.fillRect( gameCanvas.width / 2, 0, gameCanvas.width / 2, gameCanvas.height );
+      gameContext.restore( );
+
 
       // draw coupler
       gameContext.save( );
       gameContext.fillStyle = "#222222";
-      gameContext.globalAlpha = .2;
+      gameContext.globalAlpha = .3;
       gameContext.fillRect( 0, gameState.couplerY, gameCanvas.width, 32 );
       gameContext.restore( );
 
