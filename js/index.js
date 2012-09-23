@@ -21,6 +21,9 @@ $(function() {
       aDown = false,
 
       world = null, //< box2d world
+      bodyDef = new b2BodyDef, //< bodyDef used to create all particles
+      fixDef = null, //< fixure definition used while creating particles
+      worldBodies = [ ], //< array of bodies created for the current level
 
       gameCanvas = null,
       gameContext = null,
@@ -163,10 +166,11 @@ $(function() {
       // load resources
       resources.higgs = $( '<img src="img/higgs.png" />' )[ 0 ];
       resources.photon = $( '<img src="img/photon.png" />' )[ 0 ];
+      resources.topQuark = $( '<img src="img/top-quark.png" />' )[ 0 ];
 
       // create box2d world
       world = new b2World(
-                new b2Vec2( 0, 10 ), //< gravity
+                new b2Vec2( 0, 32 ), //< gravity
                 true //< allow sleep
               );
 
@@ -178,8 +182,22 @@ $(function() {
     }
 
     // init current game state
-
     $.extend( gameState, defaultGameState );
+
+    // create level objects
+    bodyDef.type = b2Body.b2_dynamicBody;
+    
+    fixDef = new b2FixtureDef;
+    fixDef.density = 1.0;
+    fixDef.friction = 0;
+    fixDef.restitution = 0.2;
+    fixDef.shape = new b2CircleShape( 32 );
+
+    bodyDef.position.x = 128;
+    bodyDef.position.y = -64;
+
+    worldBodies.push( world.CreateBody( bodyDef ) );
+    worldBodies[ 0 ].CreateFixture( fixDef );
 
     // start the game
     setTimeout( function() {
@@ -199,10 +217,16 @@ $(function() {
     } else {
 
       //
-      // process input, tick state
+      // process input, tick state, step physics
       //
 
       gameState.couplerY = ( gameState.couplerY + 96 ) % ( gameCanvas.height * 3 );
+
+      world.Step(
+        1 / 31.25, //< frame-rate
+        10, //< velocity iterations
+        10 //< position iterations
+      );
 
       //
       // render
@@ -223,6 +247,9 @@ $(function() {
       gameContext.globalAlpha = .3;
       gameContext.fillRect( 0, gameState.couplerY, gameCanvas.width, 32 );
       gameContext.restore( );
+
+      // draw particles
+      gameContext.drawImage( resources.topQuark, worldBodies[ 0 ].m_xf.position.x - 32, worldBodies[ 0 ].m_xf.position.y - 32 );
 
       // draw higgs
       var higgsResource = aDown ? resources.higgs : resources.photon;
