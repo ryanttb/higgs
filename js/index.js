@@ -15,7 +15,9 @@ $(function() {
 
       defaultGameState = {
         higgsX: 0, //< current x location, set to have screen width on game start
-        higgsY: 0 //< current y location, set to bottom of screen on game start
+        higgsY: 0, //< current y location, set to bottom of screen on game start
+
+        couplerY: 0 //< current position of a coupler segment (they move fast)
       },
 
       gameState = { };
@@ -58,7 +60,7 @@ $(function() {
     if ( currentScreen ) {
       currentScreen.trigger( "tick" );
 
-      timeoutTick = setTimeout( tick, 64 );
+      timeoutTick = setTimeout( tick, 32 );
     }
   }
 
@@ -166,9 +168,32 @@ $(function() {
     if ( startDown || bDown ) {
       changeScreen( "#pause" );
     } else {
-      gameContext.fillStyle = "#b09999";
-      gameContext.fillRect( 0, 0, gameCanvas.width, gameCanvas.height);
 
+      //
+      // process input, tick state
+      //
+
+      gameState.couplerY += 96;
+      if ( gameState.couplerY > gameCanvas.height * 3 ) {
+        gameState.couplerY = 0;
+      }
+
+      //
+      // render
+      //
+
+      // clear
+      gameContext.fillStyle = "#b09999";
+      gameContext.fillRect( 0, 0, gameCanvas.width, gameCanvas.height );
+
+      // draw coupler
+      gameContext.save( );
+      gameContext.fillStyle = "#222222";
+      gameContext.globalAlpha = .2;
+      gameContext.fillRect( 0, gameState.couplerY, gameCanvas.width, 32 );
+      gameContext.restore( );
+
+      // draw higgs
       var higgsResource = aDown ? resources.higgs : resources.photon;
       gameContext.drawImage( higgsResource, gameState.higgsX - 32, gameState.higgsY - 32 );
     }
