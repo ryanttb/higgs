@@ -1,6 +1,7 @@
 $(function() {
   /* box2d defines */
-  var b2Vec2 = Box2D.Common.Math.b2Vec2,
+  var b2Settings = Box2D.Common.b2Settings,
+      b2Vec2 = Box2D.Common.Math.b2Vec2,
       b2BodyDef = Box2D.Dynamics.b2BodyDef,
       b2Body = Box2D.Dynamics.b2Body,
       b2FixtureDef = Box2D.Dynamics.b2FixtureDef,
@@ -21,7 +22,7 @@ $(function() {
       aDown = false,
 
       world = null, //< box2d world
-      bodyDef = new b2BodyDef, //< bodyDef used to create all particles
+      bodyDef = new b2BodyDef( ), //< bodyDef used to create all particles
       fixDef = null, //< fixure definition used while creating particles
       worldBodies = [ ], //< array of bodies created for the current level
 
@@ -195,17 +196,15 @@ $(function() {
     // create level objects
     bodyDef.type = b2Body.b2_dynamicBody;
     
-    fixDef = new b2FixtureDef;
+    fixDef = new b2FixtureDef( );
     fixDef.density = 1.0;
     fixDef.friction = 0;
     fixDef.restitution = 0.2;
     fixDef.shape = new b2CircleShape( 32 );
 
-    bodyDef.position.x = 128;
-    bodyDef.position.y = -64;
-
-    bodyDef.linearVelocity.x = 0;
-    bodyDef.linearVelocity.y = 128;
+    bodyDef.position.Set( 128, -64 );
+    bodyDef.linearVelocity.Set( 0, 128 );
+    bodyDef.angle = b2Settings.b2_pi / 2;
 
     worldBodies.push( world.CreateBody( bodyDef ) );
     worldBodies[ 0 ].CreateFixture( fixDef );
