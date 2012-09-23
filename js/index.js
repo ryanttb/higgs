@@ -77,7 +77,7 @@ $(function() {
     if ( currentScreen ) {
       currentScreen.trigger( "tick" );
 
-      timeoutTick = setTimeout( tick, 32 );
+      timeoutTick = setTimeout( tick, 1000 / 30 );
     }
   }
 
@@ -170,7 +170,7 @@ $(function() {
 
       // create box2d world
       world = new b2World(
-                new b2Vec2( 0, 32 ), //< gravity
+                new b2Vec2( 0, 0 ), //< gravity
                 true //< allow sleep
               );
 
@@ -195,6 +195,9 @@ $(function() {
 
     bodyDef.position.x = 128;
     bodyDef.position.y = -64;
+
+    bodyDef.linearVelocity.x = 0;
+    bodyDef.linearVelocity.y = 128;
 
     worldBodies.push( world.CreateBody( bodyDef ) );
     worldBodies[ 0 ].CreateFixture( fixDef );
@@ -223,7 +226,7 @@ $(function() {
       gameState.couplerY = ( gameState.couplerY + 96 ) % ( gameCanvas.height * 3 );
 
       world.Step(
-        1 / 31.25, //< frame-rate
+        1 / 30, //< frame-rate
         10, //< velocity iterations
         10 //< position iterations
       );
