@@ -174,6 +174,14 @@ $(function() {
                 true //< allow sleep
               );
 
+      // setup debug draw
+      var debugDraw = new b2DebugDraw();
+      debugDraw.SetSprite(gameContext);
+      debugDraw.SetFillAlpha(0.5);
+      debugDraw.SetLineThickness(1.0);
+      debugDraw.SetFlags(b2DebugDraw.e_shapeBit | b2DebugDraw.e_jointBit);
+      world.SetDebugDraw(debugDraw);
+
       // set default state
       defaultGameState.higgsX = gameCanvas.width / 2;
       defaultGameState.higgsY = gameCanvas.height - 128;
@@ -257,6 +265,9 @@ $(function() {
       // draw higgs
       var higgsResource = aDown ? resources.higgs : resources.photon;
       gameContext.drawImage( higgsResource, gameState.higgsX - 32, gameState.higgsY - 32 );
+
+      // draw physics debug
+      world.DrawDebugData();
     }
   } );
 
