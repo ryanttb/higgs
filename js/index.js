@@ -24,7 +24,8 @@ $(function() {
       world = null, //< box2d world
       bodyDef = new b2BodyDef( ), //< bodyDef used to create all particles
       fixDef = null, //< fixure definition used while creating particles
-      worldBodies = [ ], //< array of bodies created for the current level
+      curBody, //< body iterator
+      nextBody, //< body iterator
 
       gameCanvas = null,
       gameContext = null,
@@ -206,8 +207,7 @@ $(function() {
     bodyDef.linearVelocity.Set( 0, 128 );
     bodyDef.angle = b2Settings.b2_pi / 2;
 
-    worldBodies.push( world.CreateBody( bodyDef ) );
-    worldBodies[ 0 ].CreateFixture( fixDef );
+    world.CreateBody( bodyDef ).CreateFixture( fixDef );
 
     // start the game
     setTimeout( function() {
@@ -259,14 +259,24 @@ $(function() {
       gameContext.restore( );
 
       // draw particles
-      gameContext.drawImage( resources.topQuark, worldBodies[ 0 ].m_xf.position.x - 32, worldBodies[ 0 ].m_xf.position.y - 32 );
+      // the particle to draw will eventually be part of userData on the body
+      curBody = world.GetBodyList( );
+      while ( curBody ) {
+        nextBody = curBody.GetNext( );
+
+        if ( curBody.m_type === b2Body.b2_dynamicBody ) {
+          gameContext.drawImage( resources.topQuark, curBody.m_xf.position.x - 32, curBody.m_xf.position.y - 32 );
+        }
+
+        curBody = nextBody;
+      }
 
       // draw higgs
       var higgsResource = aDown ? resources.higgs : resources.photon;
       gameContext.drawImage( higgsResource, gameState.higgsX - 32, gameState.higgsY - 32 );
 
       // draw physics debug
-      world.DrawDebugData();
+      //world.DrawDebugData();
     }
   } );
 
