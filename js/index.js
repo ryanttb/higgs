@@ -23,9 +23,12 @@ $(function() {
 
       world = null, //< box2d world
       bodyDef = new b2BodyDef( ), //< bodyDef used to create all particles
-      fixDef = null, //< fixure definition used while creating particles
+      fixDef = new b2FixtureDef( ), //< fixure definition used while creating particles
       curBody, //< body iterator
       nextBody, //< body iterator
+
+      higgsBody = null, //< body just for higgs
+      higgsOffscreenPos = new b2Vec2( 320, 480 ),
 
       gameCanvas = null,
       gameContext = null,
@@ -35,15 +38,17 @@ $(function() {
       bgGradRight = null, //< canvas gradient object for right half
 
       defaultGameState = {
-        higgsX: 0, //< current x location, set to have screen width on game start
-        higgsY: 0, //< current y location, set to bottom of screen on game start
-
         couplerY: 0 //< current position of a coupler segment (they move fast)
       },
 
       gameState = { }, //< state of active game play
 
       currentLevel = ""; //< level currently being played
+
+  // create a generic particle circle shape
+  // we only need to do this once at the beginning
+  // until we get more intricate particle shapes
+  fixDef.shape = new b2CircleShape( 32 );
 
   function changeScreen( id ) {
     clearTimeout( timeoutTick );
@@ -183,10 +188,6 @@ $(function() {
       debugDraw.SetLineThickness(1.0);
       debugDraw.SetFlags(b2DebugDraw.e_shapeBit | b2DebugDraw.e_jointBit);
       world.SetDebugDraw(debugDraw);
-
-      // set default state
-      defaultGameState.higgsX = gameCanvas.width / 2;
-      defaultGameState.higgsY = gameCanvas.height - 128;
     } else {
       // recreate?
     }
@@ -194,15 +195,28 @@ $(function() {
     // init current game state
     $.extend( gameState, defaultGameState );
 
+    // set default position
+    gameState.higgsPos = new b2Vec2( gameCanvas.width / 2, gameCanvas.height - 128 );
+
     // create level objects
+
+    // eventually we will create bodies in tick
+    // when we need them depending on frame
     bodyDef.type = b2Body.b2_dynamicBody;
     
-    fixDef = new b2FixtureDef( );
     fixDef.density = 1.0;
     fixDef.friction = 0;
     fixDef.restitution = 0.2;
-    fixDef.shape = new b2CircleShape( 32 );
 
+    // create higgs
+    bodyDef.position.Set( 320, 480 );
+    bodyDef.linearVelocity.Set( 0, 0 );
+    bodyDef.angle = b2Settings.b2_pi / -2;
+
+    higgsBody = world.CreateBody( bodyDef );
+    higgsBody.CreateFixture( fixDef );
+
+    // create everyone else
     bodyDef.position.Set( 128, -64 );
     bodyDef.linearVelocity.Set( 0, 128 );
     bodyDef.angle = b2Settings.b2_pi / 2;
@@ -218,19 +232,27 @@ $(function() {
   /* game */
 
   $( "#game" ).mousemove( function( e ) {
-    gameState.higgsX = e.offsetX;
+    gameState.higgsPos.x = e.offsetX;
   } );
 
   $( "#game" ).on( "tick", function ( ) {
     if ( startDown || bDown ) {
       changeScreen( "#pause" );
     } else {
-
       //
       // process input, tick state, step physics
       //
 
+      // draw the tube coupler
       gameState.couplerY = ( gameState.couplerY + 96 ) % ( gameCanvas.height * 3 );
+
+      if ( aDown ) {
+        // move the higgs body back onto the screen
+        higgsBody.SetPosition( gameState.higgsPos );
+      } else {
+        // move higgs back offscreen
+        higgsBody.SetPosition( higgsOffscreenPos );
+      }
 
       world.Step(
         1 / 30, //< frame-rate
@@ -263,8 +285,8 @@ $(function() {
       while ( curBody ) {
         nextBody = curBody.GetNext( );
 
-        if ( curBody.m_type === b2Body.b2_dynamicBody ) {
-          // only draw dynamic bodies now
+        if ( curBody.m_type === b2Body.b2_dynamicBody && curBody !== higgsBody ) {
+          // only draw dynamic bodies that are not higgs
           if ( curBody.m_xf.position.y > gameCanvas.height + 32 ) {
             // if the body has gone too far, delete it here instead of drawing it
             world.DestroyBody( curBody );
@@ -279,8 +301,7 @@ $(function() {
       }
 
       // draw higgs
-      var higgsResource = aDown ? resources.higgs : resources.photon;
-      gameContext.drawImage( higgsResource, gameState.higgsX - 32, gameState.higgsY - 32 );
+      gameContext.drawImage( aDown ? resources.higgs : resources.photon, gameState.higgsPos.x - 32, gameState.higgsPos.y - 32 );
 
       // draw physics debug
       //world.DrawDebugData();
