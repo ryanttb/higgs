@@ -258,14 +258,21 @@ $(function() {
       gameContext.fillRect( 0, gameState.couplerY, gameCanvas.width, 32 );
       gameContext.restore( );
 
-      // draw particles
-      // the particle to draw will eventually be part of userData on the body
+      // run through the body list
       curBody = world.GetBodyList( );
       while ( curBody ) {
         nextBody = curBody.GetNext( );
 
         if ( curBody.m_type === b2Body.b2_dynamicBody ) {
-          gameContext.drawImage( resources.topQuark, curBody.m_xf.position.x - 32, curBody.m_xf.position.y - 32 );
+          // only draw dynamic bodies now
+          if ( curBody.m_xf.position.y > gameCanvas.height + 32 ) {
+            // if the body has gone too far, delete it here instead of drawing it
+            world.DestroyBody( curBody );
+          } else {
+            // draw the particle
+            // the particle image to draw will eventually be part of userData on the body
+            gameContext.drawImage( resources.topQuark, curBody.m_xf.position.x - 32, curBody.m_xf.position.y - 32 );
+          }
         }
 
         curBody = nextBody;
